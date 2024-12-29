@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
-
-const Dashboard = () => <h2>Welcome to the Dashboard</h2>;
+import Dashboard from "./pages/Dashboard";
+import Fallback from "./pages/Fallback";
 
 const App = () => {
   return (
@@ -21,6 +21,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<Fallback/>} />
       </Routes>
     </Router>
   );

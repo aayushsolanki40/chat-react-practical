@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { AuthContext } from "../context/AuthContext";
@@ -6,8 +6,15 @@ import { AuthContext } from "../context/AuthContext";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setAuthenticated } = useContext(AuthContext)!;
+  const { isAuthenticated, setAuthenticated } = useContext(AuthContext)!;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if(isAuthenticated){
+        navigate("/dashboard");
+    }
+  }, [isAuthenticated]);
+  
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

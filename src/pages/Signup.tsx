@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import { AuthContext } from "../context/AuthContext";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { isAuthenticated } = useContext(AuthContext)!;
   const navigate = useNavigate();
+
+  useEffect(() => {
+      if(isAuthenticated){
+          navigate("/dashboard");
+      }
+    }, [isAuthenticated]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
