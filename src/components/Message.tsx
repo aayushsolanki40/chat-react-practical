@@ -61,7 +61,9 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-300 rounded-full"></div>
-              <div className="text-xs text-gray-50 ml-1">Online - {groupMembers.join(', ')}</div>
+              <div className="text-xs text-gray-50 ml-1">
+                Online - {groupMembers.join(", ")}
+              </div>
             </div>
           </div>
           <div className="p-2 text-white cursor-pointer hover:bg-purple-500 rounded-full">
@@ -100,64 +102,12 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
             <div className="text-xs text-gray-400">1 day ago</div>
           </div>
         </div>
-        <div className="flex items-end w-3/4">
-          <img
-            className="w-8 h-8 m-3 rounded-full"
-            src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
-            alt="avatar"
-          />
-          <div className="p-3 bg-purple-300 dark:bg-gray-800  mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
-            <div className="text-xs text-gray-100 hidden dark:text-gray-200">
-              Rey Jhon A. Baqurin
-            </div>
-            <div className="text-gray-700 dark:text-gray-200">
-              gsegjsghjbdg bfb sbjbfsj fsksnf jsnfj snf nnfnsnfsnj
-            </div>
-            <div className="text-xs text-gray-400">1 day ago</div>
-          </div>
-        </div>
 
         <div className="flex justify-end">
           <div className="flex items-end w-auto bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
             <div className="p-2">
               <div className="text-gray-200">Hello ? How Can i help you ?</div>
             </div>
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <div className="flex items-end w-3/4 bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
-            <div className="p-2">
-              <div className="text-gray-200">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <div className="flex items-end w-3/4 bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 max-w-xl md:w-auto">
-            <div className="p-2">
-              <div className="text-gray-200 ">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-end w-3/4">
-          <img
-            className="w-8 h-8 m-3 rounded-full"
-            src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
-            alt="avatar"
-          />
-          <div className="p-3 bg-purple-300 dark:bg-gray-800 mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
-            <div className="text-xs text-gray-100 hidden dark:text-gray-200">
-              Rey Jhon A. Baqurin
-            </div>
-            <div className="text-gray-700 dark:text-gray-200">
-              Hello po ang pogi niyo :)
-            </div>
-            <div className="text-xs text-gray-400">just now</div>
           </div>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ConversationItem from "./ConversationItem";
 import axiosInstance from "../api/axiosInstance";
+import socketInstance from "../api/socketInstance";
 
 const Conversation = ({
-  setCurrentGroupId,
+  setCurrentGroup,
 }: {
-  setCurrentGroupId: React.Dispatch<any>;
+  setCurrentGroup: React.Dispatch<any>;
 }) => {
   const [conversations, setConversations] = useState<
     { id: string; name: string }[]
@@ -20,6 +21,14 @@ const Conversation = ({
     }
   }
 
+  function changeRoom(item: any) {
+    setCurrentGroup((prev: any)=> {
+      if (prev){
+        socketInstance.emit("leave-room", prev.id);
+      } return item;
+    });
+  }
+
   useEffect(() => {
     fetchConversation();
   }, []);
@@ -28,7 +37,7 @@ const Conversation = ({
     <div className="p-1">
       {conversations.map((item) => (
         <ConversationItem
-          onClick={() => setCurrentGroupId(item)}
+          onClick={() => changeRoom(item)}
           key={item.id}
           id={item.id}
           name={item.name}

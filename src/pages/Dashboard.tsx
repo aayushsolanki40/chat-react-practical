@@ -77,7 +77,7 @@ function Dashboard() {
             <div className="text-lg font-semibol text-gray-600 dark:text-gray-200 p-3">
               Chats
             </div>
-            <Conversation setCurrentGroupId={setCurrentGroup} />
+            <Conversation setCurrentGroup={setCurrentGroup} />
           </div>
         </div>
         <div className="flex-grow  h-screen p-2 rounded-md">
