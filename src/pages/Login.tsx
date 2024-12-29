@@ -21,11 +21,23 @@ const Login = () => {
     try {
       await axiosInstance.post("/users/login", { username, password });
       setAuthenticated(true);
+      checkUserInfo();
       navigate("/dashboard");
     } catch (error: any) {
       alert(error?.response?.data?.message ?? "Signup failed");
     }
   };
+
+  async function checkUserInfo(): Promise<boolean> {
+    try {
+      const user = await axiosInstance.get("/users/me");
+      localStorage.setItem("user", JSON.stringify(user?.data.data));
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

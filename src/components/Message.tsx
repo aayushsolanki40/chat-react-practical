@@ -1,10 +1,24 @@
 import React, { useEffect, useState } from "react";
 import socketInstance from "../api/socketInstance";
 import axiosInstance from "../api/axiosInstance";
+import moment from "moment";
 
-const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; } }) => {
+interface iMessage {
+  userId: string;
+  username: string;
+  message: string;
+  time: Date;
+}
+
+const Messages = ({
+  currentGroup,
+}: {
+  currentGroup: { id: string; name: string };
+}) => {
   const [message, setMessage] = useState("");
   const [groupMembers, setGroupMembers] = useState<any>([]);
+  const [messagesList, setMessagesList] = useState<iMessage[]>([]);
+  const user = JSON.parse(localStorage.getItem("user") ?? "");
 
   function onKeyUp(e: any) {
     if (e.key === "Enter" && message !== "") {
@@ -12,9 +26,30 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
         room: currentGroup.id,
         message: e.target.value,
       });
+      setMessage("");
     }
   }
-  
+
+  useEffect(() => {
+    const handleNewMessage = (data: any) => {
+      setMessagesList((prevMessages) => [
+        ...prevMessages,
+        {
+          userId: data.userId,
+          username: data.username,
+          message: data.message,
+          time: new Date(),
+        },
+      ]);
+    };
+
+    socketInstance.on("new-message", handleNewMessage);
+
+    return () => {
+      socketInstance.off("new-message", handleNewMessage);
+    };
+  }, []);
+
   useEffect(() => {
     async function fetchGroupDetails() {
       const members = await axiosInstance.get(
@@ -25,7 +60,12 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
         setGroupMembers(members.data.data.map((e: any) => e.user.username));
       }
     }
-    currentGroup.id && fetchGroupDetails();
+
+    setMessagesList([]);
+
+    if (currentGroup.id) {
+      fetchGroupDetails();
+    }
   }, [currentGroup.id]);
 
   return (
@@ -85,31 +125,40 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
         </div>
       </div>
       <div className="w-full flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto">
-        <div className="flex items-end w-3/4">
-          <img
-            className="hidden w-8 h-8 m-3 rounded-full"
-            src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
-            alt="avatar"
-          />
-          <div className="w-8 m-3 rounded-full" />
-          <div className="p-3 bg-purple-300 dark:bg-gray-800 mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
-            <div className="text-xs text-gray-600 dark:text-gray-200">
-              Rey Jhon A. Baqurin
+        {messagesList.map((message, key) =>
+          message.userId !== user?.id ? (
+            <div
+              key={`${message.userId}${moment(message.time).format('YYMMDDHHmmSS')}`}
+              className="flex items-end w-3/4"
+            >
+              <img
+                className="hidden w-8 h-8 m-3 rounded-full"
+                src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
+                alt="avatar"
+              />
+              <div className="w-8 m-3 rounded-full" />
+              <div className="p-3 bg-purple-300 dark:bg-gray-800 mx-3 my-1 rounded-2xl rounded-bl-none sm:w-3/4 md:w-3/6">
+                <div className="text-xs text-gray-600 dark:text-gray-200">
+                  {message.username}
+                </div>
+                <div className="text-gray-700 dark:text-gray-200">
+                  {message.message}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {moment(message.time).format("MMM DD, YYYY h:mm A")}
+                </div>
+              </div>
             </div>
-            <div className="text-gray-700 dark:text-gray-200">
-              gsegjsghjbdg bfb sbjbfsj fsksnf jsnfj snf nnfnsnfsnj
+          ) : (
+            <div key={key} className="flex justify-end">
+              <div className="flex items-end w-auto bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
+                <div className="p-2">
+                  <div className="text-gray-200">{message.message}</div>
+                </div>
+              </div>
             </div>
-            <div className="text-xs text-gray-400">1 day ago</div>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <div className="flex items-end w-auto bg-purple-500 dark:bg-gray-800 m-1 rounded-xl rounded-br-none sm:w-3/4 md:w-auto">
-            <div className="p-2">
-              <div className="text-gray-200">Hello ? How Can i help you ?</div>
-            </div>
-          </div>
-        </div>
+          )
+        )}
       </div>
       <div className="h-15  p-3 rounded-xl rounded-tr-none rounded-tl-none bg-gray-100 dark:bg-gray-800">
         <div className="flex items-center">
@@ -133,27 +182,11 @@ const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; 
             <input
               className="input text-gray-700 dark:text-gray-200 text-sm p-5 focus:outline-none bg-gray-100 dark:bg-gray-800  flex-grow rounded-l-md"
               type="text"
-              placeholder="Type your message ..."
+              placeholder="Type your message and press enter key to send ..."
               onKeyUp={onKeyUp}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <div className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200  flex justify-center items-center pr-3 text-gray-400 rounded-r-md">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                />
-              </svg>
-            </div>
           </div>
         </div>
       </div>

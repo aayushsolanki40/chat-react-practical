@@ -15,13 +15,9 @@ function Dashboard() {
       socketInstance.emit("join-room", {
         room: currentGroup.id,
       });
-      socketInstance.on("new-message", (data) => {
-        console.log(data);
-      });
     }
 
     return () => {
-      socketInstance.off("new-message");
       socketInstance.emit("leave-room", currentGroup?.id);
     };
   }, [currentGroup]);

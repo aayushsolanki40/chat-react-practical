@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   async function checkUserInfo(): Promise<boolean> {
     try {
       const user = await axiosInstance.get("/users/me");
-      console.log(user?.data.data);
+      localStorage.setItem("user", JSON.stringify(user?.data.data));
       return true;
     } catch (err) {
       console.log(err);
