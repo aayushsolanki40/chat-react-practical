@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import socketInstance from "../api/socketInstance";
 import axiosInstance from "../api/axiosInstance";
 import moment from "moment";
+import { Form, Input } from "antd";
 
 interface iMessage {
   userId: string;
@@ -15,10 +16,12 @@ const Messages = ({
 }: {
   currentGroup: { id: string; name: string };
 }) => {
+  const [form] = Form.useForm();
   const [message, setMessage] = useState("");
   const [groupMembers, setGroupMembers] = useState<any>([]);
   const [messagesList, setMessagesList] = useState<iMessage[]>([]);
   const user = JSON.parse(localStorage.getItem("user") ?? "");
+  const [isUsernameModalOpen, setIsUsernameModalOpen] = useState(false);
 
   function onKeyUp(e: any) {
     if (e.key === "Enter" && message !== "") {
@@ -68,6 +71,57 @@ const Messages = ({
     }
   }, [currentGroup.id]);
 
+  const handleInviteSubmit = async (data: { username: string }) => {
+    try {
+      const response = await axiosInstance.post(`/chat/group/invite`, {
+        groupId: currentGroup.id,
+        username: data.username,
+      });
+      alert(response.data.message);
+      setGroupMembers((prev: string[]) => [...prev, data.username]);
+      setIsUsernameModalOpen(false);
+      form.resetFields();
+    } catch (error: any) {
+      console.error("Invite Error:", error);
+      alert(error?.response?.data?.message ?? "Error while sending invite");
+    }
+  };
+
+  const InviteModal = ({ isOpen, onClose, onSubmit }: any) => {
+    return (
+      isOpen && (
+        <div className="fixed inset-0 flex justify-center items-center z-50 bg-gray-500 bg-opacity-50">
+          <div className="bg-white p-5 rounded-lg w-80">
+            <h3 className="text-lg font-semibold mb-4">Invite a Friend</h3>
+            <Form form={form} onFinish={handleInviteSubmit}>
+              <Form.Item name="username" required>
+                <Input
+                  type="text"
+                  placeholder="Enter username"
+                  className="w-full p-2 border rounded-md mb-4"
+                />
+              </Form.Item>
+              <div className="flex justify-between">
+                <button
+                  onClick={onClose}
+                  className="bg-gray-400 text-white px-4 py-2 rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                >
+                  Invite
+                </button>
+              </div>
+            </Form>
+          </div>
+        </div>
+      )
+    );
+  };
+
   return (
     <div className="flex-grow h-full flex flex-col">
       <div className="w-full h-15 p-1 bg-purple-600 dark:bg-gray-800 shadow-md rounded-xl rounded-bl-none rounded-br-none">
@@ -106,7 +160,10 @@ const Messages = ({
               </div>
             </div>
           </div>
-          <div className="p-2 text-white cursor-pointer hover:bg-purple-500 rounded-full">
+          <div
+            className="p-2 text-white cursor-pointer hover:bg-purple-500 rounded-full"
+            onClick={() => setIsUsernameModalOpen((prev) => !prev)}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -127,10 +184,7 @@ const Messages = ({
       <div className="w-full flex-grow bg-gray-100 dark:bg-gray-900 my-2 p-2 overflow-y-auto">
         {messagesList.map((message, key) =>
           message.userId !== user?.id ? (
-            <div
-              key={`${message.userId}${moment(message.time).format('YYMMDDHHmmSS')}`}
-              className="flex items-end w-3/4"
-            >
+            <div key={key} className="flex items-end w-3/4">
               <img
                 className="hidden w-8 h-8 m-3 rounded-full"
                 src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_960_720.png"
@@ -190,6 +244,13 @@ const Messages = ({
           </div>
         </div>
       </div>
+
+      {/* Invite Modal */}
+      <InviteModal
+        isOpen={isUsernameModalOpen}
+        onClose={() => setIsUsernameModalOpen(false)}
+        onSubmit={handleInviteSubmit}
+      />
     </div>
   );
 };

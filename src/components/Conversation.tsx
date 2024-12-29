@@ -48,12 +48,12 @@ const Conversation = ({
       const result = await axiosInstance.post("/chat/group", {
         name: newChatName,
       });
-      console.log(result);
 
       setConversations((prev) => [
         ...prev,
         { id: result.data.id, name: result.data.name },
       ]);
+      
       setIsModalOpen(false);
       setNewChatName("");
     } catch (error) {
