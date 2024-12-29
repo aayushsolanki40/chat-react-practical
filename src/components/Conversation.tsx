@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import ConversationItem from "./ConversationItem";
 import axiosInstance from "../api/axiosInstance";
 
-const Conversation = () => {
+const Conversation = ({
+  setCurrentGroupId,
+}: {
+  setCurrentGroupId: React.Dispatch<any>;
+}) => {
   const [conversations, setConversations] = useState<
     { id: string; name: string }[]
   >([]);
@@ -23,7 +27,12 @@ const Conversation = () => {
   return (
     <div className="p-1">
       {conversations.map((item) => (
-        <ConversationItem key={item.id} id={item.id} name={item.name} />
+        <ConversationItem
+          onClick={() => setCurrentGroupId(item)}
+          key={item.id}
+          id={item.id}
+          name={item.name}
+        />
       ))}
     </div>
   );

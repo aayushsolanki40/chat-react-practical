@@ -1,9 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Conversation from "../components/Conversation";
 import Messages from "../components/Message";
+import socketInstance from "../api/socketInstance";
 
 function Dashboard() {
-  const [currentGroupId, setCurrentGroupId] = useState(null);
+  const [currentGroup, setCurrentGroup] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (currentGroup?.id) {
+      socketInstance.connect();
+      socketInstance.emit("join-room", {
+        room: currentGroup.id,
+      });
+      socketInstance.on("new-message", (data) => {
+        console.log(data);
+      });
+    }
+
+    return () => {
+      socketInstance.off("new-message");
+      socketInstance.emit("leave-room", currentGroup?.id);
+    };
+  }, [currentGroup]);
 
   return (
     <div className="">
@@ -56,11 +77,11 @@ function Dashboard() {
             <div className="text-lg font-semibol text-gray-600 dark:text-gray-200 p-3">
               Chats
             </div>
-            <Conversation />
+            <Conversation setCurrentGroupId={setCurrentGroup} />
           </div>
         </div>
         <div className="flex-grow  h-screen p-2 rounded-md">
-          <Messages />
+          {currentGroup?.id && <Messages currentGroup={currentGroup} />}
         </div>
       </div>
     </div>

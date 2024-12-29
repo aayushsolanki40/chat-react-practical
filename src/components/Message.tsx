@@ -1,6 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import socketInstance from "../api/socketInstance";
+import axiosInstance from "../api/axiosInstance";
 
-const Messages = () => {
+const Messages = ({ currentGroup }: { currentGroup: { id: string; name: string; } }) => {
+  const [message, setMessage] = useState("");
+  const [groupMembers, setGroupMembers] = useState<any>([]);
+
+  function onKeyUp(e: any) {
+    if (e.key === "Enter" && message !== "") {
+      socketInstance.emit("message", {
+        room: currentGroup.id,
+        message: e.target.value,
+      });
+    }
+  }
+  
+  useEffect(() => {
+    async function fetchGroupDetails() {
+      const members = await axiosInstance.get(
+        `/chat/group/${currentGroup.id}/members`
+      );
+
+      if (Array.isArray(members.data.data)) {
+        setGroupMembers(members.data.data.map((e: any) => e.user.username));
+      }
+    }
+    currentGroup.id && fetchGroupDetails();
+  }, [currentGroup.id]);
+
   return (
     <div className="flex-grow h-full flex flex-col">
       <div className="w-full h-15 p-1 bg-purple-600 dark:bg-gray-800 shadow-md rounded-xl rounded-bl-none rounded-br-none">
@@ -30,11 +57,11 @@ const Messages = () => {
           </div>
           <div className="flex-grow p-2">
             <div className="text-md text-gray-50 font-semibold">
-              Rey Jhon A. Baquirin{" "}
+              {currentGroup?.name}
             </div>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-300 rounded-full"></div>
-              <div className="text-xs text-gray-50 ml-1">Online</div>
+              <div className="text-xs text-gray-50 ml-1">Online - {groupMembers.join(', ')}</div>
             </div>
           </div>
           <div className="p-2 text-white cursor-pointer hover:bg-purple-500 rounded-full">
@@ -157,6 +184,9 @@ const Messages = () => {
               className="input text-gray-700 dark:text-gray-200 text-sm p-5 focus:outline-none bg-gray-100 dark:bg-gray-800  flex-grow rounded-l-md"
               type="text"
               placeholder="Type your message ..."
+              onKeyUp={onKeyUp}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
             <div className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200  flex justify-center items-center pr-3 text-gray-400 rounded-r-md">
               <svg

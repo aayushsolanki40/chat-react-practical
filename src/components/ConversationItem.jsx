@@ -1,15 +1,9 @@
 import React from "react";
 
-const ConversationItem = ({ id, name, active = false }) => {
-  const _class = active ? "bg-gray-200" : "bg-white";
+const ConversationItem = ({ id, name, onClick }) => {
   return (
-    <div>
-      <div
-        className={
-          "conversation-item p-1 dark:bg-gray-700 hover:bg-gray-200 m-1 rounded-md " +
-          _class
-        }
-      >
+    <div onClick={onClick}>
+      <div className={"conversation-item p-1  m-1 rounded-md bg-gray-700 "}>
         <div className={"flex items-center p-2  cursor-pointer  "}>
           <div className="w-7 h-7 m-1">
             <img
